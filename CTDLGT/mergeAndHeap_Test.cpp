@@ -12,34 +12,16 @@ typedef vector<pi> vii;
 template<class T>
 void merge(T a[], int l, int m, int r)
 {
-	vector<int> x(a + l, a + m + 1);
-	vector<int> y(a + m + 1, a + r + 1);
+	vector<T> x(a + l, a + m + 1);
+	vector<T> y(a + m + 1, a + r + 1);
 	int i = 0, j = 0;
-	while(i < x.size() && j < y.size())
+	while(i < x.size()  && j < y.size())
 	{
-		if (x[i] < y[j])
-		{
-			a[l] = x[i];
-			l++; i++; 
-		}
-		else
-		{
-			a[l] = y[j];
-			l++; j++;
-		}
+		if(x[i] > y[j]) a[l++] = y[j++];
+		else a[l++] = x[i++]; 
 	}
-	while(i < x.size())
-	{
-		a[l] = x[i];
-		l++;
-		i++;
-	}
-	while(j < y.size())
-	{
-		a[l] = y[j];
-		l++;
-		j++;
-	}
+	while(i < x.size()) a[l++] = x[i++];
+	while(j < y.size()) a[l++] = y[j++];
 }
 template<class T>
 void mergeSort(T a[], int l, int r)
@@ -50,35 +32,33 @@ void mergeSort(T a[], int l, int r)
 	mergeSort(a, m + 1, r);
 	merge(a, l, m, r);
 }
-
 template<class T>
-void heapify(T * a, int n, int i)
+void heapify(T *a, int n, int i)
 {
 	int l = 2 * i + 1;
 	int r = 2 * i + 2;
 	int larg = i;
-	//tim phan tu lon nhat cua hai node left, right;
+	
 	if (l < n && a[l] > a[larg]) larg = l;
-	if ( r < n && a[r] > a[larg]) larg = r;
+	if (r < n && a[r] > a[larg]) larg = r;
 	if (larg != i)
 	{
 		swap(a[i], a[larg]);
 		heapify(a, n, larg);
 	}
 }
-
 template<class T>
-void heapSort(T * a, int n)
+void heapSort(T *a, int n)
 {
-	for (int i = n / 2 - 1; i >= 0; --i) // cac phan tu khong phai node la
+	for (int i = n / 2 - 1; i >= 0; --i)
 	{
 		heapify(a, n, i);
 	}
 	
 	for(int i = n - 1; i >= 0; --i)
 	{
-		swap(a[i], a[0]); // swap phan tu lon nhat xuong cuoi danh sach
-		heapify(a, i , 0);
+		swap(a[i], a[0]);
+		heapify(a, i, 0);
 	}
 }
 int main()
@@ -87,12 +67,8 @@ int main()
     cin.tie(NULL);
     int n; cin >> n;
     int a[n];
-    for(int &x :a) cin >> x;
-    heapSort(a, n);
-    for(int i = 0; i < n ;++i)
-    {
-    	cout <<a[i] << " ";
-	}
-    return 0;
+    for(int &x : a) cin >> x;
+    mergeSort(a, 0, n - 1);
+    for(int x : a) cout << x <<" ";
 }
 

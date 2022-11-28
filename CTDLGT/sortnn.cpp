@@ -80,9 +80,9 @@ int main()
     {
     	cin >> x;
 	}
-//	BubbleSort(a, n);
+	BubbleSort(a, n);
 //	SelectionSort(a, n);
-	insertionSort(a, n);
+//	insertionSort(a, n);
 	for(int x : a) 
 	{
 		cout << x <<" ";
