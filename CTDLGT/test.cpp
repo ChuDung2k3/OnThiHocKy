@@ -1,151 +1,180 @@
-#include<bits/stdc++.h>
-#define ll long long
-#define pb push_back
-#define fi first
-#define se second
-using namespace std;
-
-typedef pair<int, int> pi;
-typedef vector<int> vi;
-typedef vector<pi> vii;
-template<class T>
-struct node{
-	T data;
-	node *next;
-};
-
-template<class T>
-node<T> *makeNode(T x)
+#include <stdio.h>
+#include <stdlib.h>
+ 
+typedef struct Node
 {
-	node<T> *newNode = new node<T>();
-	newNode->data = x;
-	newNode->next = NULL;
-	return newNode;
-}
-template<class T>
-int size(node<T> *head)
+    int data;
+    Node* left;
+    Node* right;
+} node_t;
+ 
+ 
+ 
+void Free( node_t* root )
 {
-	int cnt = 0;
-	while(head != NULL)
-	{
-		++cnt;
-		head = head->next;
-	}
-	return cnt;
+    if ( root == NULL )
+        return;
+ 
+    Free( root->left );
+    Free( root->right );
+    free( root );
 }
-template<class T>
-void duyet(node<T> *head)
+ 
+int LeftOf( const int value, const node_t* root )
 {
-	while(head != NULL)
-	{
-		cout << head->data <<' ';
-		head = head->next;
-	}
+    // N?u b?n mu?n cây BST cho phép giá tr? trùng l?p, hãy s? d?ng dòng code th? 2
+    return value < root->data;
+//    return value <= root->data;
 }
-template<class T>
-void pushFront(node<T> *&head, T x)
+ 
+int RightOf( const int value, const node_t* root )
 {
-	node<T> *newNode = makeNode(x);
-	newNode->next = head;
-	head = newNode;
+    return value > root->data;
 }
-template<class T>
-void pushBack(node<T> *&head, T x)
+ 
+node_t* Insert( node_t* root, const int value )
 {
-	node<T> *newNode = makeNode(x);
-	node<T> *tmp = head;
-	if (head == NULL)
-	{
-		head = newNode;
-		return;
-	}
-	while(tmp->next != NULL)
-	{
-		tmp = tmp->next;
-	}
-	tmp->next = newNode; 
+    if ( root == NULL )
+    {
+        node_t* node = (node_t*)malloc( sizeof( node_t ) );
+        node->left = NULL;
+        node->right = NULL;
+        node->data = value;
+        return node;
+    }
+    if ( LeftOf( value, root ) )
+        root->left = Insert( root->left, value );
+    else if ( RightOf( value, root ) )
+        root->right = Insert( root->right, value );
+    return root;
 }
-template<class T>
-void insert(node<T> *&head, int k, int x)
+ 
+bool Search( const node_t* root, int value )
 {
-	int n = size(head);
-	if (k < 1 || k > n + 1) return;
-	if (k == 1)
-	{
-		pushFront(head, x);
-		return;
-	} 
-	node<T> *tmp = head;
-	for(int i = 1; i <= k -2; ++i)
-	{
-		tmp = tmp->next;
-	}
-	node<T> *newNode = makeNode(x);
-	newNode->next = tmp->next;
-	tmp->next = newNode;
+    if ( root == NULL )
+        return false;
+    if(root->data == value){
+        return true;
+    }else if ( LeftOf( value, root ) ){
+        return Search( root->left, value );
+    }else if( RightOf( value, root ) ){
+        return Search( root->right, value );
+    }
 }
-
-template<class T>
-void popFront(node<T> *&head)
+ 
+int LeftMostValue( const node_t* root )
 {
-	if (head == NULL) return;
-	node<T> *tmp = head;
-	head = head->next;
-	delete tmp;
+    while ( root->left != NULL )
+        root = root->left;
+    return root->data;
 }
-template<class T>
-void popBack(node<T> *&head)
+ 
+node_t* Delete( node_t* root, int value )
 {
-	if (head == NULL) return;
-	node<T> *tmp = head;
-	if (tmp->next == NULL)
-	{
-		head = NULL;
-		delete tmp;
-		return;
-	}
-	while(tmp->next->next != NULL)
-	{
-		tmp = tmp->next;
-	}
-	node<T> *last = tmp->next;
-	tmp->next = NULL;
-	delete last;
+    if ( root == NULL )
+        return root;
+    if ( LeftOf( value, root ) )
+        root->left = Delete( root->left, value );
+    else if ( RightOf( value, root ) )
+        root->right = Delete( root->right, value );
+    else
+    {
+        // root->data == value, delete this node
+        if ( root->left == NULL )
+        {
+            node_t* newRoot = root->right;
+            free( root );
+            return newRoot;
+        }
+        if ( root->right == NULL )
+        {
+            node_t* newRoot = root->left;
+            free( root );
+            return newRoot;
+        }
+        root->data = LeftMostValue( root->right );
+        root->right = Delete( root->right, root->data );
+    }
+    return root;
 }
-
-template<class T>
-void erase(node<T> *&head, int k)
-{
-	int n = size(head);
-	if (k < 1 || k > n) return;
-	if (k == 1)
-	{
-	 	popFront(head);
-		return;
-	} 
-	node<T> *tmp = head;
-	for(int i = 1; i <= k - 2; ++i)
-	{
-		tmp = tmp->next;
-	}
-	node<T> *kth = tmp->next; // Node thu k;
-	tmp->next = kth->next;
-	delete kth;
+ 
+void PreOrder(node_t* root){
+    if(root != NULL)
+    {
+        printf("%d ", root->data);
+        PreOrder(root->left);
+        PreOrder(root->right);
+    }
 }
+ 
+void InOrder(node_t* root){
+    if(root != NULL)
+    {
+        InOrder(root->left);
+        printf("%d ", root->data);
+        InOrder(root->right);
+    }
+}
+ 
+void PostOrder(node_t* root){
+    if(root != NULL)
+    {
+        PostOrder(root->left);
+        PostOrder(root->right);
+        printf("%d ", root->data);
+    }
+}
+ 
+ 
 int main()
 {
-	ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    node<double> *head = NULL;
-	for(int i = 0; i < 5; ++i)
-	{
-		pushFront(head, 2.3);
-	}
-//	cout <<2.3;
-	pushBack(head, 6 * 1.0);
-//	insert(head, 3, 10);
-//	popFront(head);
-//	popBack(head);
-    duyet(head);
+    node_t* root = NULL;
+ 
+    root = Insert( root, 25 );
+    root = Insert( root, 15 );
+    root = Insert( root, 50 );
+    root = Insert( root, 10 );
+    root = Insert( root, 22 );
+    root = Insert( root, 35 );
+    root = Insert( root, 70 );
+    root = Insert( root, 4 );
+    root = Insert( root, 12 );
+    root = Insert( root, 18 );
+    root = Insert( root, 24 );
+    root = Insert( root, 31 );
+    root = Insert( root, 44 );
+    root = Insert( root, 20 );
+    root = Insert( root, 90 );
+    printf("\nDuyet preorder : ");
+    PreOrder(root);
+    printf("\nDuyet inorder  : ");
+    InOrder(root);
+    printf("\nDuyet postorder:");
+    PostOrder(root);
+ 
+    printf("\n==Thu them phan tu 15 vao BTS==\n");
+    Insert(root, 15);
+    printf("\nDuyet preorder : ");
+    PreOrder(root);
+    printf("\nDuyet inorder  : ");
+    InOrder(root);
+    printf("\nDuyet postorder:");
+    PostOrder(root);
+ 
+ 
+    printf("\n==Thu xoa phan tu 50 khoi BTS==\n");
+    Delete(root, 50);
+    printf("\nDuyet preorder : ");
+    PreOrder(root);
+    printf("\nDuyet inorder  : ");
+    InOrder(root);
+    printf("\nDuyet postorder:");
+    PostOrder(root);
+ 
+ 
+ 
+ 
+    Free( root );
+    root = NULL;
+    return 0;
 }
-
